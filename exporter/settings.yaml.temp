@@ -1,0 +1,45 @@
+sources:
+    data_file: '' # full path to the data file
+    output_file: '' # full path to output directory
+    mapzen_file_url: 'http://s3.amazonaws.com/osm-polygons.mapzen.com/planet_geojson.tgz'
+
+national_level: 2 # default for OSM country borders
+down_to_admin_level: 8 # down to admin level, you want to extract, 8 for nigeria wards
+
+# logging setup
+logging:
+    version: 1
+    disable_existing_loggers: False
+    formatters:
+        simple:
+            format: '%(levelname)s %(message)s'
+        verbose:
+            format: '%(levelname)s %(asctime)s %(module)s %(message)s'
+            datefmt: '%Y/%m/%d %H:%M:%S'
+
+    handlers:
+        console:
+            class: logging.StreamHandler
+            formatter: simple
+            level: DEBUG
+            stream: ext://sys.stdout
+        file:
+            class : logging.FileHandler
+            formatter: verbose
+            level: DEBUG
+            mode: w
+            filename: /tmp/export.log
+
+    # optionally set a specific logger for extract module
+    # loggers:
+    #     extract:
+    #         level: DEBUG
+    #         handlers:
+    #             - console
+
+    root:
+        level: DEBUG
+        handlers:
+            - console
+            - file
+

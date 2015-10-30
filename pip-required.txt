@@ -1,0 +1,5 @@
+PyYAML
+geojson==1.0.7
+GDAL
+pep8==1.5.6
+pylint==1.2.0

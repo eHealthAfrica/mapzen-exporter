@@ -1,3 +1,6 @@
+#!/usr/bin/python2
+# -*- coding: utf-8 -*-
+
 import logging
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger('mapzen_settings.log')

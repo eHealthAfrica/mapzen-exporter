@@ -177,7 +177,7 @@ def parse(dir_path, output_dir, admin_levels, tolerance):
 
         write(file_path, collection)
         write(simplify_file_path, simplified_collection)
-        LOG.info('Complete parsing admin level : {} '.format(level))
+        LOG.info('Complete parsing admin level : {} '.format(level_count))
         level_count += 1
 
 

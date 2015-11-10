@@ -4,3 +4,4 @@ pep8==1.5.6
 pylint==1.2.0
 wgetter
 geojson
+autopep8

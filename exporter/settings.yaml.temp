@@ -10,7 +10,7 @@ admin_levels:
     - 4
     - 8
 
-tolerance = 0.001
+tolerance: 0.001
 
 # logging setup
 logging:

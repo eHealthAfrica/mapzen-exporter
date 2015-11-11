@@ -28,10 +28,9 @@ if __name__ == '__main__':
     admin_levels = sorted(settings.get('admin_levels'))
     tolerance = settings.get('tolerance')
 
-    # TODO: uncomment lines above and decide actions to take base on args
-
-    # utils.init_path(dest)
-    #file_path = utils.download(url, dest)
-    #utils.extract(file_path, dest)
+    # set up data file, extract file and
+    utils.init_path(dest)
+    file_path = utils.download(url, dest)
+    utils.extract(file_path, dest)
 
     process.parse(extracted_geojson_dir, output_dir, admin_levels, tolerance)

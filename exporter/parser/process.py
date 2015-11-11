@@ -75,7 +75,8 @@ def get_ancestor(ancestor_lyr, child_geom):
         feature = ancestor_lyr.GetNextFeature()
 
 
-def parse_features(file_name, ancestor_admin_file, tolerance, lvl_count):
+def parse_features(file_name, ancestor_admin_file,
+                   tolerance, lvl_count, admin_levels):
     temp = {
         'type': 'FeatureCollection',
         'crs': {
@@ -106,9 +107,10 @@ def parse_features(file_name, ancestor_admin_file, tolerance, lvl_count):
                 if lyr:
                     ancestor = get_ancestor(lyr, geom)
                     if ancestor:
-                        child = set_ancestor_fields(ancestor, feature_json)
+                        child = set_ancestor_fields(
+                            ancestor, feature_json, admin_levels)
                         simplified_child = set_ancestor_fields(
-                            ancestor, simplify_feat_json)
+                            ancestor, simplify_feat_json, admin_levels)
 
                         feat_collection.get('features').append(child)
                         simplify_feature_collection.get(
@@ -121,24 +123,24 @@ def parse_features(file_name, ancestor_admin_file, tolerance, lvl_count):
     yield feat_collection, simplify_feature_collection
 
 
-def set_ancestor_fields(ancestor_fields, child_json):
+def set_ancestor_fields(ancestor_fields, child_json, admin_levels):
     in_country = 'is_in_country'
     in_state = 'is_in_state'
     in_lga = 'is_in_lga'
 
     if ancestor_fields:
-        # TODO: read 2, 4, 6, dynamically from settings.yaml
         ancestor_level = ancestor_fields.get('admin_level')
-        if ancestor_level == str(2):
+
+        if ancestor_level == admin_levels[0]:
             # state, set is_in_country
             child_json['properties'][
                 in_country] = ancestor_fields.get('osm_id')
-        elif ancestor_level == str(4):
+        elif ancestor_level == admin_levels[1]:
             # LGA, set is_in_country and is_in_state
             child_json['properties'][
                 in_country] = ancestor_fields.get(in_country)
             child_json['properties'][in_state] = ancestor_fields.get('osm_id')
-        elif ancestor_level == str(6):
+        elif ancestor_level == admin_levels[2]:
             child_json['properties'][
                 in_country] = ancestor_fields.get(in_country)
             child_json['properties'][in_state] = ancestor_fields.get(in_state)
@@ -164,7 +166,12 @@ def parse(dir_path, output_dir, admin_levels, tolerance):
                 output_dir, base_file_name.format(
                     level=ancestor_level))
 
-        result = parse_features(f_name, ancestor_file, tolerance, level_count)
+        result = parse_features(
+            f_name,
+            ancestor_file,
+            tolerance,
+            level_count,
+            admin_levels)
         collection, simplified_collection = result.next()
 
         file_path = os.path.join(
@@ -179,6 +186,9 @@ def parse(dir_path, output_dir, admin_levels, tolerance):
         write(simplify_file_path, simplified_collection)
         LOG.info('Complete parsing admin level : {} '.format(level_count))
         level_count += 1
+
+    LOG.info('Completed extraction of files from: {} to {}').format(
+        dir_path, output_dir)
 
 
 def simplify_geom(feature, tolerance=0.001):

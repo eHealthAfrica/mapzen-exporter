@@ -60,9 +60,10 @@ def get_ancestor(ancestor_lyr, child_geom):
     feature = ancestor_lyr.GetNextFeature()
     if feature is None or child_geom is None:
         return
-    properties = json.loads(feature.ExportToJson()).get('properties')
+
     while feature is not None:
         if feature.GetGeometryRef().Intersects(child_geom):
+            properties = json.loads(feature.ExportToJson()).get('properties')
             return {
                 'osm_id': properties.get('osm_id'),
                 'admin_level': properties.get('admin_level'),
@@ -71,6 +72,7 @@ def get_ancestor(ancestor_lyr, child_geom):
                 'is_in_lga': properties.get('is_in_lga'),
                 'is_in_ward': properties.get('is_in_ward'),
             }
+
         feature = None
         feature = ancestor_lyr.GetNextFeature()
 
@@ -141,6 +143,8 @@ def set_ancestor_fields(ancestor_fields, child_json, admin_levels):
                 in_country] = ancestor_fields.get(in_country)
             child_json['properties'][in_state] = ancestor_fields.get('osm_id')
         elif ancestor_level == str(admin_levels[2]):
+            # Ward level, set is_in_country and is_in_state and is_in_lga
+            # properties
             child_json['properties'][
                 in_country] = ancestor_fields.get(in_country)
             child_json['properties'][in_state] = ancestor_fields.get(in_state)

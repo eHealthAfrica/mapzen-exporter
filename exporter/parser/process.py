@@ -131,16 +131,16 @@ def set_ancestor_fields(ancestor_fields, child_json, admin_levels):
     if ancestor_fields:
         ancestor_level = ancestor_fields.get('admin_level')
 
-        if ancestor_level == admin_levels[0]:
+        if ancestor_level == str(admin_levels[0]):
             # state, set is_in_country
             child_json['properties'][
                 in_country] = ancestor_fields.get('osm_id')
-        elif ancestor_level == admin_levels[1]:
+        elif ancestor_level == str(admin_levels[1]):
             # LGA, set is_in_country and is_in_state
             child_json['properties'][
                 in_country] = ancestor_fields.get(in_country)
             child_json['properties'][in_state] = ancestor_fields.get('osm_id')
-        elif ancestor_level == admin_levels[2]:
+        elif ancestor_level == str(admin_levels[2]):
             child_json['properties'][
                 in_country] = ancestor_fields.get(in_country)
             child_json['properties'][in_state] = ancestor_fields.get(in_state)

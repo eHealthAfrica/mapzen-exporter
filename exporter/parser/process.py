@@ -187,8 +187,9 @@ def parse(dir_path, output_dir, admin_levels, tolerance):
         LOG.info('Complete parsing admin level : {} '.format(level_count))
         level_count += 1
 
-    LOG.info('Completed extraction of files from: {} to {}').format(
+    LOG.info('Completed extraction of files from: {} to {}'.format(
         dir_path, output_dir)
+    )
 
 
 def simplify_geom(feature, tolerance=0.001):

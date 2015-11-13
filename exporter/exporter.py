@@ -30,6 +30,7 @@ if __name__ == '__main__':
 
     # set up data file, extract file and
     utils.init_path(dest)
+    utils.init_path(output_dir)
     file_path = utils.download(url, dest)
     utils.extract(file_path, dest)
 

@@ -1,11 +1,16 @@
 sources:
-    data_dir: '/home/eha/mapzen-data/' # full path to the data file
+    data_dir: '/home/username/mapzen-data/' # full path to the data file
     output_file: '' # full path to output directory
-    mapzen_file_url: 'http://s3.amazonaws.com/osm-polygons.mapzen.com/planet_geojson.tgz'
-    geojson_dir_name: 'planet' # extracted geojson folder name
+    mapzen_file_url: 'https://s3.amazonaws.com/osm-polygons.mapzen.com/nigeria_geojson.tgz'
+    geojson_dir_name: '/home/username/mapzen-data/country_name'
 
-national_level: 2 # default for OSM country borders
-down_to_admin_level: 8 # down to admin level, you want to extract, 8 for nigeria wards
+admin_levels:
+    - 2
+    - 6
+    - 4
+    - 8
+
+tolerance: 0.001
 
 # logging setup
 logging:

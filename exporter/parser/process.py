@@ -12,7 +12,7 @@ import copy
 from osgeo import ogr
 
 
-def format_feature(feature, tolerance):
+def format_feature(feature, tolerance, level):
     feat_json = json.loads(feature.ExportToJson())
     properties = feat_json.get('properties')
     iso_code = properties.get('ISO3166-1')
@@ -26,10 +26,9 @@ def format_feature(feature, tolerance):
             'name_en': properties.get('name:en'),
             'iso3166': iso_code,
             'is_in_country': None,
-            'is_in_state': None,
-            'is_in_lga': None,
-            'is_in_ward': None,
-            'admin_level': properties.get('admin_level')
+            'parent_id': None,
+            'is_simplified': None,
+            'admin_level': level
         },
         'geometry': feature.GetGeometryRef(),
         'simplified_geometry': simplify_geom(feature, tolerance)
@@ -67,10 +66,9 @@ def get_ancestor(ancestor_lyr, child_geom):
             return {
                 'osm_id': properties.get('osm_id'),
                 'admin_level': properties.get('admin_level'),
+                'parent_id': properties.get('parent_id'),
                 'is_in_country': properties.get('is_in_country'),
-                'is_in_state': properties.get('is_in_state'),
-                'is_in_lga': properties.get('is_in_lga'),
-                'is_in_ward': properties.get('is_in_ward'),
+                'is_simplified': properties.get('is_simplified')
             }
 
         feature = None
@@ -78,7 +76,7 @@ def get_ancestor(ancestor_lyr, child_geom):
 
 
 def parse_features(file_name, ancestor_admin_file,
-                   tolerance, lvl_count, admin_levels):
+                   tolerance, lvl_count):
     temp = {
         'type': 'FeatureCollection',
         'crs': {
@@ -93,14 +91,18 @@ def parse_features(file_name, ancestor_admin_file,
     feat_collection = copy.deepcopy(temp)
     simplify_feature_collection = copy.deepcopy(temp)
     for (name, feature) in read_feature(file_name):
-        result = format_feature(feature, tolerance)
+        result = format_feature(feature, tolerance, lvl_count)
         properties = result.get('properties')
         geom = result.get('geometry')
         simplify_geometry = result.get('simplified_geometry')
 
         feature_json = prepare_feature_json(properties, geom.ExportToJson())
+
+        # prepared simplified json
+        simplified_properties = copy.deepcopy(properties)
+        simplified_properties['is_simplified'] = True
         simplify_feat_json = prepare_feature_json(
-            properties, simplify_geometry.ExportToJson())
+            simplified_properties, simplify_geometry.ExportToJson())
 
         if lvl_count > 0:
             data_source = ogr.Open(ancestor_admin_file)
@@ -110,9 +112,10 @@ def parse_features(file_name, ancestor_admin_file,
                     ancestor = get_ancestor(lyr, geom)
                     if ancestor:
                         child = set_ancestor_fields(
-                            ancestor, feature_json, admin_levels)
+                            ancestor, feature_json)
+
                         simplified_child = set_ancestor_fields(
-                            ancestor, simplify_feat_json, admin_levels)
+                            ancestor, simplify_feat_json)
 
                         feat_collection.get('features').append(child)
                         simplify_feature_collection.get(
@@ -125,30 +128,17 @@ def parse_features(file_name, ancestor_admin_file,
     yield feat_collection, simplify_feature_collection
 
 
-def set_ancestor_fields(ancestor_fields, child_json, admin_levels):
+def set_ancestor_fields(ancestor_fields, child_json):
     in_country = 'is_in_country'
-    in_state = 'is_in_state'
-    in_lga = 'is_in_lga'
+    ancestor_osm_id = ancestor_fields.get('osm_id')
 
     if ancestor_fields:
-        ancestor_level = ancestor_fields.get('admin_level')
+        country_id = ancestor_fields.get(in_country)
+        if not country_id and ancestor_fields.get('admin_level') == 0:
+            country_id = ancestor_osm_id
 
-        if ancestor_level == str(admin_levels[0]):
-            # state, set is_in_country
-            child_json['properties'][
-                in_country] = ancestor_fields.get('osm_id')
-        elif ancestor_level == str(admin_levels[1]):
-            # LGA, set is_in_country and is_in_state
-            child_json['properties'][
-                in_country] = ancestor_fields.get(in_country)
-            child_json['properties'][in_state] = ancestor_fields.get('osm_id')
-        elif ancestor_level == str(admin_levels[2]):
-            # Ward level, set is_in_country and is_in_state and is_in_lga
-            # properties
-            child_json['properties'][
-                in_country] = ancestor_fields.get(in_country)
-            child_json['properties'][in_state] = ancestor_fields.get(in_state)
-            child_json['properties'][in_lga] = ancestor_fields.get('osm_id')
+        child_json['properties']['parent_id'] = ancestor_osm_id
+        child_json['properties'][in_country] = country_id
     return child_json
 
 
@@ -162,28 +152,28 @@ def parse(dir_path, output_dir, admin_levels, tolerance):
     file_names.sort()
     level_count = 0
 
+    out_base_file = 'admin_level_{level}.json'
     for f_name in file_names:
         ancestor_file = ''
         ancestor_level = level_count - 1
         if ancestor_level >= 0:
             ancestor_file = os.path.join(
-                output_dir, base_file_name.format(
+                output_dir, out_base_file.format(
                     level=ancestor_level))
 
         result = parse_features(
             f_name,
             ancestor_file,
             tolerance,
-            level_count,
-            admin_levels)
+            level_count)
         collection, simplified_collection = result.next()
 
         file_path = os.path.join(
-            output_dir, base_file_name.format(
+            output_dir, out_base_file.format(
                 level=level_count))
         temp_file = '_'.join([str(level_count), 'simplified'])
         simplify_file_path = os.path.join(
-            output_dir, base_file_name.format(
+            output_dir, out_base_file.format(
                 level=temp_file))
 
         write(file_path, collection)

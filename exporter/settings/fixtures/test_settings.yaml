@@ -1,0 +1,51 @@
+sources:
+    data_dir: '/home/username/mapzen-data/' # full path to the data file
+    output_file: '' # full path to output directory
+    mapzen_file_url: 'https://s3.amazonaws.com/osm-polygons.mapzen.com/nigeria_geojson.tgz'
+    geojson_dir_name: '/home/username/mapzen-data/country_name'
+
+admin_levels:
+    - 2
+    - 6
+    - 4
+    - 8
+
+tolerance: 0.001
+
+# logging setup
+logging:
+    version: 1
+    disable_existing_loggers: False
+    formatters:
+        simple:
+            format: '%(levelname)s %(message)s'
+        verbose:
+            format: '%(levelname)s %(asctime)s %(module)s %(message)s'
+            datefmt: '%Y/%m/%d %H:%M:%S'
+
+    handlers:
+        console:
+            class: logging.StreamHandler
+            formatter: simple
+            level: DEBUG
+            stream: ext://sys.stdout
+        file:
+            class : logging.FileHandler
+            formatter: verbose
+            level: DEBUG
+            mode: w
+            filename: /tmp/export.log
+
+    # optionally set a specific logger for extract module
+    # loggers:
+    #     extract:
+    #         level: DEBUG
+    #         handlers:
+    #             - console
+
+    root:
+        level: DEBUG
+        handlers:
+            - console
+            - file
+

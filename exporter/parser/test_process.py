@@ -1,8 +1,10 @@
 import process
 import json
 import os
+import shutil
 import unittest
 
+from os.path import expanduser
 from osgeo import ogr
 
 class ProcessTestCase(unittest.TestCase):
@@ -18,6 +20,14 @@ class ProcessTestCase(unittest.TestCase):
         child_file = os.path.join(cwd, fixture, 'child.json')
         with open(child_file) as data_file:
             self.child_json = json.loads(data_file.read())
+
+        self.fixture_dir = os.path.join(cwd, fixture)
+        # get user home dir
+        home_dir = expanduser("~")
+        # empty string to force creation of output dir
+        self.parse_output_dir = os.path.join(home_dir, 'parse_output_dir', '')
+        if not os.path.exists(self.parse_output_dir):
+            os.makedirs(self.parse_output_dir)
 
         self.properties = {
             'admin_level': 3,
@@ -56,6 +66,8 @@ class ProcessTestCase(unittest.TestCase):
         self.ancestor_fields = None
         if os.path.exists(self.write_file_path):
             os.remove(self.write_file_path)
+        if os.path.exists(self.parse_output_dir):
+            shutil.rmtree(self.parse_output_dir)
 
     def test_write(self):
         assert os.path.isfile(self.write_file_path) is False
@@ -190,6 +202,17 @@ class ProcessTestCase(unittest.TestCase):
         assert first_simplified_feature['properties']['parent_id'] == expected_ancestor_json['properties']['osm_id']
 
     def test_parse(self):
-        # TODO: implement
-        pass
+        country_level = 2
+        state_level = 4
+        admin_levels = [country_level, state_level]
+        process.parse(self.fixture_dir, self.parse_output_dir, admin_levels, self.tolerance)
+
+        output_files = os.listdir(self.parse_output_dir)
+
+        assert len(output_files) == (len(admin_levels) * 2)
+        assert 'admin_level_0_simplified.json' in output_files
+        assert 'admin_level_1_simplified.json' in output_files
+        assert 'admin_level_1.json' in output_files
+        assert 'admin_level_0.json' in output_files
+
 

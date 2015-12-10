@@ -1,3 +1,4 @@
 env
 mapzen_env
 exporter/settings.yaml
+.coverage

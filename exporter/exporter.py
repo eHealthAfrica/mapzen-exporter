@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import wgetter
 
 from settings.mapzen_settings import MapZenSettings
 from utility import utils
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     # set up data file, extract file and
     utils.init_path(dest)
     utils.init_path(output_dir)
-    file_path = utils.download(url, dest)
+    file_path = wgetter.download(url, outdir=dest)
     utils.extract(file_path, dest)
 
     process.parse(extracted_geojson_dir, output_dir, admin_levels, tolerance)

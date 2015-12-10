@@ -12,8 +12,9 @@ class UtilsTestCase(unittest.TestCase):
     def setUp(self):
         # get user home dir
         home_dir = expanduser("~")
-        # empty string to force creation of output dir
         self.base_dir = os.path.join(home_dir, 'mapzen_test_dir')
+
+        # empty string to force creation of output dir
         self.output_dir = os.path.join(self.base_dir, 'output', '')
         self.test_file = os.path.join(self.output_dir, 'test.json')
 

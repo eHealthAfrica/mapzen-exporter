@@ -155,8 +155,8 @@ class ProcessTestCase(unittest.TestCase):
         expected = feature.GetGeometryRef().SimplifyPreserveTopology(self.tolerance).ExportToJson()
         assert result == expected
 
-    def test_intersect(self):
-        features = process.read_feature(self.ds_file_path)
+    def test_intersects_spatially(self):
+        features = process.read_feature(self.output_ancestor_file_path)
         name, parent_feature = features.next()
 
         assert parent_feature is not None
@@ -165,15 +165,22 @@ class ProcessTestCase(unittest.TestCase):
         name1, child_feature1 = child_features.next()
         name2, child_feature2 = child_features.next()
 
-        assert process.intersect(parent_feature, child_feature2)
-        assert process.intersect(child_feature1, child_feature2) is False
+        feature_id = 0
+        child_geom1 = child_feature1.GetGeometryRef()
+        child_geom2 = child_feature2.GetGeometryRef()
+        parent_geom = parent_feature.GetGeometryRef()
+
+        ancestor_id = json.loads(parent_feature.ExportToJson()).get('properties').get('osm_id')
+
+        assert process.intersects_spatially(parent_feature, child_geom1, feature_id) == ancestor_id
+        assert process.intersects_spatially(child_feature1, child_geom2, feature_id) is None
 
     def test_get_ancestor(self):
         ancestor = None
         child_features = process.read_feature(self.ds_file_path_2)
         name1, child_feature1 = child_features.next()
 
-        data_source = ogr.Open(self.ds_file_path)
+        data_source = ogr.Open(self.output_ancestor_file_path)
         if data_source:
             lyr = data_source.GetLayer(0)
             if lyr:
@@ -183,11 +190,13 @@ class ProcessTestCase(unittest.TestCase):
 
     def test_parse_features(self):
         level = 1
+        country_id = 192830
         result = process.parse_features(
             self.ds_file_path_2,
             self.output_ancestor_file_path,
             self.tolerance,
-            level)
+            level,
+            country_id)
 
         collection, simplified_collection = result.next()
         name, expected_ancestor = process.read_feature(self.output_ancestor_file_path).next()
@@ -205,7 +214,8 @@ class ProcessTestCase(unittest.TestCase):
         country_level = 2
         state_level = 4
         admin_levels = [country_level, state_level]
-        process.parse(self.fixture_dir, self.parse_output_dir, admin_levels, self.tolerance)
+        country_id = 192830
+        process.parse(self.fixture_dir, self.parse_output_dir, admin_levels, self.tolerance, country_id)
 
         output_files = os.listdir(self.parse_output_dir)
 

@@ -1,8 +1,9 @@
 sources:
-    data_dir: '/home/username/mapzen-data/' # full path to the data file
-    output_file: '' # full path to output directory
-    mapzen_file_url: 'https://s3.amazonaws.com/osm-polygons.mapzen.com/nigeria_geojson.tgz'
-    geojson_dir_name: '/home/username/mapzen-data/country_name'
+    data_dir: '/home/username/data/' # full path to the data file
+    output_dir: '/home/username/data/output/' # full path to output directory
+    data_url: 'http://download.geofabrik.de/africa-latest.osm.pbf'
+    input_dir: '/home/username/data/input/'
+    filename: 'africa-osm.pbf'
 
 admin_levels:
     - 2
@@ -11,6 +12,8 @@ admin_levels:
     - 8
 
 tolerance: 0.001
+
+country_osm_id: 192787  # OSM Country Id,
 
 # logging setup
 logging:
@@ -35,13 +38,6 @@ logging:
             level: DEBUG
             mode: w
             filename: /tmp/export.log
-
-    # optionally set a specific logger for extract module
-    # loggers:
-    #     extract:
-    #         level: DEBUG
-    #         handlers:
-    #             - console
 
     root:
         level: DEBUG

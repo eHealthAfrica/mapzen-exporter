@@ -1,5 +1,7 @@
 # MapZen Exporter
 
+[![Coverage Status](https://coveralls.io/repos/eHealthAfrica/mapzen-exporter/badge.svg?branch=master&service=github)](https://coveralls.io/github/eHealthAfrica/mapzen-exporter?branch=master)
+
 > Service used to parse and export Admin boundaries from OSM data files such as .pbf, .05m using
 > [Fences Builder](https://github.com/pelias/fences-builder)
 > into [POSM Extracts](https://github.com/nyaruka/posm-extracts) similar format.

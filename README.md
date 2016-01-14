@@ -58,7 +58,7 @@ You need to do the following:
 
 ### Test
 ```sh
-    $ nosetests
+    $ nosetests --with-coverage
  ```
 
 ### Utilities

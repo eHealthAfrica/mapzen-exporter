@@ -5,4 +5,4 @@ wgetter
 geojson
 shapely
 rtree
-pygdal
+pygdal=1.11.2

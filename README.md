@@ -1,7 +1,10 @@
 # MapZen Exporter
 
-> Service used to convert and export Admin boundaries such as MapZen Borders
-> into [POSM Extracts](https://github.com/nyaruka/posm-extracts) expected format.
+[![Coverage Status](https://coveralls.io/repos/eHealthAfrica/mapzen-exporter/badge.svg?branch=master&service=github)](https://coveralls.io/github/eHealthAfrica/mapzen-exporter?branch=master)
+
+> Service used to parse and export Admin boundaries from OSM data files such as .pbf, .05m using
+> [Fences Builder](https://github.com/pelias/fences-builder)
+> into [POSM Extracts](https://github.com/nyaruka/posm-extracts) similar format.
 
 ### Setup Guide
 
@@ -9,6 +12,8 @@ You need to do the following:
 
 ```sh
     $ git clone https://github.com/ehealthafrica/mapzen-exporter && cd mapzen-exporter
+
+    $ npm install -g fences-builder
 
     $ virtualenv mapzen_env
 
@@ -25,8 +30,9 @@ You need to do the following:
 - In settings.yaml set the following:
     - `data_dir` : full path to the input geojson files directory
     - `output_dir`: full path to output directory
-    - `mapzen_file_url`: url to online archived file that holds each country's admin boundaries files
-    - `geojson_dir_name`: the path to directory that contains extracted admin boundaries geojson files
+    - `data_url`: url to OSM data file server
+    - `input_dir`: the path to directory that fences-builder will extract admin levels from OSM data file into.
+    - country_osm_id: OSM id of the country you want to extract from the data file.
     - admin_levels:
       > `- 2` # Default is 2 for all countries
 
@@ -39,5 +45,27 @@ You need to do the following:
 - To run, while in exporter directory
 
 ```sh
-    $ python exproter.py
+    $ python exproter.py run_all
  ```
+
+### OSM Data Sources:
+  Ensure that the region selected on the map covers the country you want to extract.
+
+  Caveat: for GeoFabrik, Country OSM data file does not extract country boundary use continent's data file.
+
+- [GeoFabrik](http://download.geofabrik.de/africa.html)
+- [BBBike](http://extract.bbbike.org/)
+
+### Test
+```sh
+    $ nosetests --with-coverage
+ ```
+
+### Utilities
+
+- `python exporter.py init_dir` : Initialises empty data directories.
+- `python exporter.py download_OSM` : Downloads given OSM data file from remote server.
+- `python exporter.py extract_admins` : Extracts OSM data file admin levels as geojson into given input directory.
+- `python exporter.py generate_output` : Generates a given country's admin levels and write resulting files to output
+directory
+- `python exporter.py run_all`: Runs all the above task in one step.

@@ -1,6 +1,8 @@
 PyYAML
-GDAL==1.11.2
 pep8==1.5.6
 pylint==1.2.0
 wgetter
 geojson
+shapely
+rtree
+pygdal==1.11.2.3

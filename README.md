@@ -1,6 +1,6 @@
 # MapZen Exporter
 
-[![Coverage Status](https://coveralls.io/repos/eHealthAfrica/mapzen-exporter/badge.svg?branch=master&service=github)](https://coveralls.io/github/eHealthAfrica/mapzen-exporter?branch=master)
+[![Build Status](https://travis-ci.org/eHealthAfrica/mapzen-exporter.svg?branch=master)](https://travis-ci.org/eHealthAfrica/mapzen-exporter) [![Coverage Status](https://coveralls.io/repos/eHealthAfrica/mapzen-exporter/badge.svg?branch=master&service=github)](https://coveralls.io/github/eHealthAfrica/mapzen-exporter?branch=master)
 
 > Service used to parse and export Admin boundaries from OSM data files such as .pbf, .05m using
 > [Fences Builder](https://github.com/pelias/fences-builder)
@@ -24,6 +24,13 @@ You need to do the following:
     $ cd exporter
 
     $ cp settings.yaml.temp settings.yaml
+```
+
+####  Installation of GDAL
+```
+$ sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+$ sudo apt-get update
+$ sudo apt-get install -y libgdal-dev python-dev build-essential libyaml-dev libspatialindex-dev
 ```
 
 ### Usage
